@@ -7,6 +7,7 @@ ThisBuild / name := "Balsam"
 
 val catsV  = "2.1.0"
 val mouseV = "0.24"
+val zioV   = "1.0.0-RC17"
 
 lazy val commonSettings = List(
   scalacOptions ++= Seq(
@@ -26,6 +27,7 @@ lazy val commonSettings = List(
   libraryDependencies ++= Seq(
         "org.typelevel" %% "cats-core" % catsV,
         "org.typelevel" %% "mouse"     % mouseV,
+        "dev.zio"       %% "zio"       % zioV,
       ),
   crossScalaVersions := supportedScalaVersions,
   scalacOptions ++= (scalaVersion.value match {
@@ -39,5 +41,6 @@ lazy val commonSettings = List(
         case _ => Nil
       }),
   Compile / console / scalacOptions --= Seq("-deprecation", "-Xfatal-warnings", "-Xlint"),
+  scalafmtOnCompile := true,
 )
 lazy val balsam = (project in file(".")).settings(commonSettings)
