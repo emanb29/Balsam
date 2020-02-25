@@ -10,5 +10,7 @@ object Main extends zio.App {
    * @return An exit code
    */
   override def run(args: List[String]): ZIO[zio.ZEnv, Nothing, Int] =
-    UIO[Int](0)
+    zio.console
+      .putStrLn("Hello, world!")
+      .andThen(UIO(0))
 }
