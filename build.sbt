@@ -5,9 +5,11 @@ ThisBuild / version := "0.1.0-SNAPSHOT"
 ThisBuild / scalaVersion := "2.13.1"
 ThisBuild / name := "Balsam"
 
-val catsV  = "2.1.0"
-val mouseV = "0.24"
-val zioV   = "1.0.0-RC17"
+val catsV       = "2.1.0"
+val mouseV      = "0.24"
+val zioV        = "1.0.0-RC17"
+val scalaTestV  = "3.1.1"
+val scalaCheckV = "1.14.1"
 
 lazy val commonSettings = List(
   scalacOptions ++= Seq(
@@ -25,9 +27,11 @@ lazy val commonSettings = List(
         "-Yrangepos",
       ),
   libraryDependencies ++= Seq(
-        "org.typelevel" %% "cats-core" % catsV,
-        "org.typelevel" %% "mouse"     % mouseV,
-        "dev.zio"       %% "zio"       % zioV,
+        "org.typelevel"  %% "cats-core"  % catsV,
+        "org.typelevel"  %% "mouse"      % mouseV,
+        "dev.zio"        %% "zio"        % zioV,
+        "org.scalatest"  %% "scalatest"  % scalaTestV % "test",
+        "org.scalacheck" %% "scalacheck" % scalaCheckV % "test",
       ),
   crossScalaVersions := supportedScalaVersions,
   scalacOptions ++= (scalaVersion.value match {

@@ -1,7 +1,7 @@
 package me.ethanbell.balsam
 
 import zio.console.{putStrLn, Console}
-import zio.{UIO, URIO, ZIO}
+import zio._
 
 object Main extends zio.App {
 
@@ -11,10 +11,14 @@ object Main extends zio.App {
    * @return An exit code
    */
   override def run(args: List[String]): ZIO[zio.ZEnv, Nothing, Int] =
-    runHandlingErrors(putStrLn("Hello, world!"))
+    runHandlingErrors(
+      ZIO.foreach_(WordList.English) { word =>
+        putStrLn(word)
+      },
+    )
 
-  def runHandlingErrors[R, E](prgm: ZIO[R, E, Unit]): URIO[Console with R, Int] =
-    prgm
+  def runHandlingErrors[R, E](program: ZIO[R, E, Unit]): URIO[Console with R, Int] =
+    program
       .mapError {
         case e: Throwable => s"Execution failed: $e"
         case o            => s"Execution failed, citing a non-throwable error: $o"
