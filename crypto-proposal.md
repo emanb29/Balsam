@@ -1,0 +1,5 @@
+For my final project, I will implement the BIP39 paper key derivation algorithm (https://github.com/bitcoin/bips/blob/master/bip-0039.mediawiki). This algorithm maps any 256-bit "entropy" value to a set of English words with high redundancy for checking parity.
+
+BIP39 is used by cryptography-focused applications such as TozStore (http://tozstore.com/), Keybase (https://keybase.io/) and coinbase (https://coinbase.com), but I couldn't find a good (and flexible) implementation for my favorite language, Scala. The algorithm is inspired by RFC-1751, but that proposal is limited to 128-bit keys and uses a less practical wordlist than BIP39.
+
+This project will involve writing an implementation of the BIP39 mneumonic generator (based on user-provided or CSPRNG-generated "entropy") with a parameter for number of words to generate. I will also implement a "splitter" (as at https://iancoleman.io/bip39/) to split the key according to a (2, 3)-threshold secret sharing scheme. Time permitting, I will extend this to support (k, n)-threshold secret sharing
