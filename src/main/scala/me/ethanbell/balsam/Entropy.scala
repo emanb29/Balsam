@@ -31,8 +31,15 @@ object Entropy {
   val empty = Entropy(BitChunk.empty)
 }
 
-case class Entropy private (bits: BitChunk) {
-  require(bits.n % 32 == 0, "Entropy must be constructed with multiples of 32 bits")
+case class Entropy private[Entropy] (bits: BitChunk) {
+  require(
+    bits.n % 32 == 0,
+    s"Entropy must be constructed with multiples of 32 bits. The provided BitChunk was $bits",
+  )
+  require(
+    bits.n <= 256,
+    s"Entropy must be constructed with no more than 256 bits. The provided BitChunk was $bits",
+  )
   lazy val checksum: BitChunk =
     MessageDigest
       .getInstance("SHA-256")

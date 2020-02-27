@@ -1,3 +1,3 @@
 package me.ethanbell
 
-package object balsam {}
+package object balsam extends Impure {}
