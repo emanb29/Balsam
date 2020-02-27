@@ -12,6 +12,7 @@ val scalaTestV  = "3.1.1"
 val scalaCheckV = "1.14.1"
 
 lazy val commonSettings = List(
+  resolvers += "BitChunk GitHub resolver" at "https://maven.pkg.github.com/emanb29/BitChunk",
   scalacOptions ++= Seq(
         "-encoding",
         "utf8",
@@ -30,6 +31,7 @@ lazy val commonSettings = List(
         "org.typelevel"  %% "cats-core"  % catsV,
         "org.typelevel"  %% "mouse"      % mouseV,
         "dev.zio"        %% "zio"        % zioV,
+        "me.ethanbell"   %% "bitchunk"   % "0.1.0-SNAPSHOT",
         "org.scalatest"  %% "scalatest"  % scalaTestV % "test",
         "org.scalacheck" %% "scalacheck" % scalaCheckV % "test",
       ),
