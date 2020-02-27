@@ -1,7 +1,10 @@
 package me.ethanbell.balsam
 
+import me.ethanbell.bitchunk.BitChunk
 import zio.console.{putStrLn, Console}
 import zio._
+
+import scala.util.Try
 
 object Main extends zio.App {
 
@@ -12,9 +15,12 @@ object Main extends zio.App {
    */
   override def run(args: List[String]): ZIO[zio.ZEnv, Nothing, Int] =
     runHandlingErrors(
-      ZIO.foreach_(WordList.English) { word =>
-        putStrLn(word)
-      },
+      ZIO
+        .fromTry(Try {
+          BitChunk.fromHexString(args.head)
+        })
+        .flatMap(Pure.getMnemonicForBits(_))
+        .flatMap(putStrLn),
     )
 
   def runHandlingErrors[R, E](program: ZIO[R, E, Unit]): URIO[Console with R, Int] =
