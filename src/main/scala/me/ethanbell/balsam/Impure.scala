@@ -8,9 +8,9 @@ import zio.DefaultRuntime
  */
 protected[balsam] trait Impure {
   def getMnemonicForEntropy(entropy: Entropy, wordList: WordList): String =
-    (new DefaultRuntime {}).unsafeRun(Mnemonic(wordList, entropy).phrase.orDie)
-  def getMnemonicForEntropy(entropy: BitChunk, wordList: WordList): String =
-    getMnemonicForEntropy(Entropy(entropy), wordList) // TODO fix this one -- it shouldn't even be able to access this constructor
-  def getMnemonicForEntropy(entropy: Seq[Int], wordList: WordList = WordList.English): String =
-    getMnemonicForEntropy(entropy.map(BitChunk.apply).reduce(_ ++ _), wordList)
+    (new DefaultRuntime {}).unsafeRun(Pure.getMnemonicForEntropy(entropy, wordList))
+  def getMnemonicForBits(entropy: BitChunk, wordList: WordList): String =
+    (new DefaultRuntime {}).unsafeRun(Pure.getMnemonicForBits(entropy, wordList))
+  def getMnemonicFor32BitChunks(entropy: Seq[Int], wordList: WordList = WordList.English): String =
+    (new DefaultRuntime {}).unsafeRun(Pure.getMnemonicFor32BitChunks(entropy, wordList))
 }

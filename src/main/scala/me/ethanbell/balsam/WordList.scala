@@ -14,7 +14,7 @@ trait WordList extends Iterable[String] {
    * @note this has to be a `def` or we get ExceptionInInitializerError caused by java.lang.NullPointerException
    * @return an alphabetically-sorted list of words
    */
-  def words: SortedSet[String]
+  def words: SortedSet[String] // This should always be 2048 words
   protected def indexedWords: IndexedSeq[String] = words.toIndexedSeq
   override def iterator: Iterator[String]        = indexedWords.iterator
 
@@ -23,19 +23,17 @@ trait WordList extends Iterable[String] {
 }
 object WordList {
   object English extends WordList {
-
-    /**
-     * I allow the "english.wordlist" string because it's statically safe
-     */
-    override def words: SortedSet[String] = {
-
+    private val wordSet = {
       // preferred over Source.fromResource("english.wordlist") for the leading /, which seems idiomatic
       val resource = Source.fromURL(getClass.getResource("/english.wordlist"))
       val words    = resource.getLines().filterNot(_.isEmpty).toSeq
       resource.close()
-      SortedSet(
-        words: _*,
-      )
+      SortedSet(words: _*)
     }
+
+    /**
+     * I allow the "english.wordlist" string because it's statically safe
+     */
+    override def words: SortedSet[String] = wordSet
   }
 }
