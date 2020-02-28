@@ -8,6 +8,7 @@ ThisBuild / name := "Balsam"
 val catsV       = "2.1.0"
 val mouseV      = "0.24"
 val zioV        = "1.0.0-RC17"
+val bitchunkV   = "2.0.0-SNAPSHOT"
 val scalaTestV  = "3.1.1"
 val scalaCheckV = "1.14.1"
 
@@ -25,15 +26,15 @@ lazy val commonSettings = List(
         "-language:higherKinds",
         "-language:implicitConversions",
         "-Ypartial-unification",
-        "-Yrangepos",
+        "-Yrangepos"
       ),
   libraryDependencies ++= Seq(
         "org.typelevel"  %% "cats-core"  % catsV,
         "org.typelevel"  %% "mouse"      % mouseV,
         "dev.zio"        %% "zio"        % zioV,
-        "me.ethanbell"   %% "bitchunk"   % "0.1.0-SNAPSHOT",
+        "me.ethanbell"   %% "bitchunk"   % bitchunkV,
         "org.scalatest"  %% "scalatest"  % scalaTestV % "test",
-        "org.scalacheck" %% "scalacheck" % scalaCheckV % "test",
+        "org.scalacheck" %% "scalacheck" % scalaCheckV % "test"
       ),
   crossScalaVersions := supportedScalaVersions,
   scalacOptions ++= (scalaVersion.value match {
@@ -47,6 +48,6 @@ lazy val commonSettings = List(
         case _ => Nil
       }),
   Compile / console / scalacOptions --= Seq("-deprecation", "-Xfatal-warnings", "-Xlint"),
-  scalafmtOnCompile := true,
+  scalafmtOnCompile := true
 )
 lazy val balsam = (project in file(".")).settings(commonSettings)

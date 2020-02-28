@@ -19,7 +19,7 @@ object Main extends zio.App {
         .fromTry(Try {
           BitChunk.fromHexString(args.head)
         })
-        .flatMap(Pure.getMnemonicForBits(_))
+        .flatMap(Mnemonic.phraseFromBitChunk(_))
         .flatMap(putStrLn)
     )
 

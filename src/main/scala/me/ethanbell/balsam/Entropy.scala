@@ -49,6 +49,6 @@ case class Entropy private[Entropy] (bits: BitChunk) {
       .take(bits.n / 32)
   private lazy val concatenatedBits = bits ++ checksum
   lazy val wordIndices: Seq[Int] = concatenatedBits
-    .grouped(11) // group into 11 bit chunks. These will be numbers in the range [0, 2047]
+    .groupedLeftPadded(11) // group into 11 bit chunks. These will be numbers in the range [0, 2047]
     .map(_.toBigInt().toInt)
 }

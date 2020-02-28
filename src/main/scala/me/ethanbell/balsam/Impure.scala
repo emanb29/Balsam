@@ -8,9 +8,9 @@ import zio.DefaultRuntime
  */
 protected[balsam] trait Impure {
   def getMnemonicForEntropy(entropy: Entropy, wordList: WordList = WordList.English): String =
-    (new DefaultRuntime {}).unsafeRun(Pure.getMnemonicForEntropy(entropy, wordList))
+    (new DefaultRuntime {}).unsafeRun(Mnemonic.phraseFromEntropy(entropy, wordList))
   def getMnemonicForBits(entropy: BitChunk, wordList: WordList = WordList.English): String =
-    (new DefaultRuntime {}).unsafeRun(Pure.getMnemonicForBits(entropy, wordList))
+    (new DefaultRuntime {}).unsafeRun(Mnemonic.phraseFromBitChunk(entropy, wordList))
   def getMnemonicFor32BitChunks(entropy: Seq[Int], wordList: WordList = WordList.English): String =
-    (new DefaultRuntime {}).unsafeRun(Pure.getMnemonicFor32BitChunks(entropy, wordList))
+    (new DefaultRuntime {}).unsafeRun(Mnemonic.phraseFrom32Bits(entropy, wordList))
 }
