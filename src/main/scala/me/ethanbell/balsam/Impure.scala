@@ -12,5 +12,5 @@ protected[balsam] trait Impure {
   def getMnemonicForBits(entropy: BitChunk, wordList: WordList = WordList.English): String =
     (new DefaultRuntime {}).unsafeRun(Mnemonic.phraseFromBitChunk(entropy, wordList))
   def getMnemonicFor32BitChunks(entropy: Seq[Int], wordList: WordList = WordList.English): String =
-    (new DefaultRuntime {}).unsafeRun(Mnemonic.phraseFrom32Bits(entropy, wordList))
+    (new DefaultRuntime {}).unsafeRun(Mnemonic.phraseFrom32BitInts(entropy, wordList))
 }

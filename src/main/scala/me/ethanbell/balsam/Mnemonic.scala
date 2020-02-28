@@ -13,12 +13,12 @@ object Mnemonic {
     wordList: WordList = WordList.English
   ): IO[RuntimeException, String] =
     Entropy.fromBitChunk(entropy).flatMap(phraseFromEntropy(_, wordList))
-  def phraseFrom32Bits(
+  def phraseFrom32BitInts(
     entropy: Seq[Int],
     wordList: WordList = WordList.English
   ): IO[IndexOutOfBoundsException, String] =
-    phraseFromBitChunk(
-      entropy.map(BitChunk.apply).reduce(_ ++ _),
+    phraseFromEntropy(
+      Entropy(entropy),
       wordList
     ).orDieWith(cause =>
       new RuntimeException("Failed to create Entropy from provided sequence of 32-bit ints", cause)
