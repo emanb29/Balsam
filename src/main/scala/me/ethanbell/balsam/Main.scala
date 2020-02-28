@@ -20,7 +20,7 @@ object Main extends zio.App {
           BitChunk.fromHexString(args.head)
         })
         .flatMap(Pure.getMnemonicForBits(_))
-        .flatMap(putStrLn),
+        .flatMap(putStrLn)
     )
 
   def runHandlingErrors[R, E](program: ZIO[R, E, Unit]): URIO[Console with R, Int] =

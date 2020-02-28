@@ -8,8 +8,8 @@ case class Mnemonic(wordList: WordList, entropy: Entropy) {
     .mapError(err =>
       new RuntimeException(
         "Somehow got an exception generating a wordlist from a valid Entropy",
-        err,
-      ),
+        err
+      )
     )
     .map(_.mkString(" "))
 }

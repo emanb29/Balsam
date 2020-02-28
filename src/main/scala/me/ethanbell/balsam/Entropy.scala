@@ -16,12 +16,12 @@ object Entropy {
     if (bs.n % 32 != 0)
       IO.fail(
         new IllegalArgumentException(
-          "Cannot generate seeds for entropy whose length does not divide 32",
-        ),
+          "Cannot generate seeds for entropy whose length does not divide 32"
+        )
       )
     else if (bs.n > 256)
       IO.fail(
-        new IllegalArgumentException("Cannot generate seeds for entropy longer than 256 bits"),
+        new IllegalArgumentException("Cannot generate seeds for entropy longer than 256 bits")
       )
     else IO.succeed(Entropy(bs))
   def apply(values: Seq[Int]): Entropy =
@@ -34,11 +34,11 @@ object Entropy {
 case class Entropy private[Entropy] (bits: BitChunk) {
   require(
     bits.n % 32 == 0,
-    s"Entropy must be constructed with multiples of 32 bits. The provided BitChunk was $bits",
+    s"Entropy must be constructed with multiples of 32 bits. The provided BitChunk was $bits"
   )
   require(
     bits.n <= 256,
-    s"Entropy must be constructed with no more than 256 bits. The provided BitChunk was $bits",
+    s"Entropy must be constructed with no more than 256 bits. The provided BitChunk was $bits"
   )
   lazy val checksum: BitChunk =
     MessageDigest

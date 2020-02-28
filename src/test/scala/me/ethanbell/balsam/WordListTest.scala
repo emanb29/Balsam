@@ -15,11 +15,11 @@ class WordListTest extends AnyFunSuite with Matchers {
     (WordList.English.size) should equal(wordList.size)
     assert(
       wordList.toSet === WordList.English.words,
-      "The elements in the wordList were different than the elements in the English WordList object",
+      "The elements in the wordList were different than the elements in the English WordList object"
     )
     assert(
       wordList.sameElements(WordList.English),
-      "The elements in the wordlist were different than the elements in the English WordList object",
+      "The elements in the wordlist were different than the elements in the English WordList object"
     )
   }
 }
