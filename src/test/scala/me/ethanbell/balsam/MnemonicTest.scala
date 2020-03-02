@@ -3,6 +3,7 @@ package me.ethanbell.balsam
 import me.ethanbell.bitchunk.BitChunk
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.matchers.should.Matchers
+import zio.DefaultRuntime
 
 class MnemonicTest extends AnyFunSuite with Matchers {
   private def phraseFromHexString(hex: String) =
@@ -94,6 +95,30 @@ class MnemonicTest extends AnyFunSuite with Matchers {
       .shouldEqual(
         "void come effort suffer camp survey warrior heavy shoot primary clutch crush open amazing screen patrol group space point ten exist slush involve unfold"
       )
+  }
+  test("Hash-based mnemonics should be consistent with iancoleman's implementation") {
+    val (phrase, phrase12, phrase15, phrase18, phrase21, phrase24) =
+      new DefaultRuntime {}.unsafeRun(for {
+        entropy <- Entropy.fromBitChunk(
+          BitChunk.fromHexString(
+            "6ae05b7d1ae49175d85770d9c8002d5c22459600"
+          )
+        )
+        phrase   <- Mnemonic.fromEntropy(entropy).phrase()
+        phrase12 <- Mnemonic.fromEntropy(entropy).phrase(12)
+        phrase15 <- Mnemonic.fromEntropy(entropy).phrase(15)
+        phrase18 <- Mnemonic.fromEntropy(entropy).phrase(18)
+        phrase21 <- Mnemonic.fromEntropy(entropy).phrase(21)
+        phrase24 <- Mnemonic.fromEntropy(entropy).phrase(24)
+      } yield {
+        (phrase, phrase12, phrase15, phrase18, phrase21, phrase24)
+      })
+    phrase shouldEqual "helmet actress tent cupboard empower road genuine unlock supply divorce area reunion cattle slam absorb"
+    phrase12 shouldEqual "surround science harvest clay inmate village state bless group flush digital case"
+    phrase15 shouldEqual "surround science harvest clay inmate village state bless group flush digital case unveil latin roof"
+    phrase18 shouldEqual "surround science harvest clay inmate village state bless group flush digital case unveil latin rookie spoon gate frost"
+    phrase21 shouldEqual "surround science harvest clay inmate village state bless group flush digital case unveil latin rookie spoon gate forum smoke year crouch"
+    phrase24 shouldEqual "surround science harvest clay inmate village state bless group flush digital case unveil latin rookie spoon gate forum smoke year creek stone cancel neutral"
   }
 
 }

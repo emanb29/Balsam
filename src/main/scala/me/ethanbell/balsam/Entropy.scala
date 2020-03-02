@@ -40,14 +40,14 @@ case class Entropy private[Entropy] (bits: BitChunk) {
     bits.n <= 256,
     s"Entropy must be constructed with no more than 256 bits. The provided BitChunk was $bits"
   )
-  lazy val checksum: BitChunk =
+  lazy val hash: BitChunk =
     MessageDigest
       .getInstance("SHA-256")
       .digest(bits.toBytes().toArray) // hash ENT
       .map(BitChunk.apply)
       .reduce(_ ++ _) // convert hash into a BitChunk
-      .take(bits.n / 32)
-  private lazy val concatenatedBits = bits ++ checksum
+
+  private lazy val concatenatedBits = bits ++ hash.take(bits.n / 32)
   lazy val wordIndices: Seq[Int] = concatenatedBits
     .groupedLeftPadded(11) // group into 11 bit chunks. These will be numbers in the range [0, 2047]
     .map(_.toUnsignedBigInt().toInt)
