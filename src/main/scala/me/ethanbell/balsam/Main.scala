@@ -14,16 +14,21 @@ object Main extends zio.App {
    * @return An exit code
    */
   override def run(args: List[String]): URIO[zio.ZEnv, Int] =
-    runHandlingErrors(
-      ZIO
-        .fromTry(Try {
-          BitChunk.fromHexString(args.head)
+    runHandlingErrors {
+      val phraseIO = for {
+        hexStr <- ZIO.fromOption[String](args.headOption)
+        bitchunk <- ZIO.fromTry(Try {
+          BitChunk.fromHexString(hexStr)
         })
-        .flatMap(Entropy.fromBitChunk)
-        .map(Mnemonic.fromEntropy(_))
-        .flatMap(_.phrase())
-        .flatMap(putStrLn)
-    )
+        entropy <- Entropy.fromBitChunk(bitchunk)
+        mnemonic = Mnemonic.fromEntropy(entropy)
+        phraseLen = ZIO.fromTry(Try {
+          args(1).toInt
+        })
+        phrase <- phraseLen.foldM(_ => mnemonic.phrase(), mnemonic.phrase)
+      } yield phrase
+      phraseIO.flatMap(putStrLn)
+    }
 
   def runHandlingErrors[R, E](program: ZIO[R, E, Unit]): URIO[Console with R, Int] =
     program

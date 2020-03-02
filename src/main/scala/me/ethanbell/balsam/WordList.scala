@@ -26,8 +26,8 @@ object WordList {
     private val wordSet = {
       // preferred over Source.fromResource("english.wordlist") for the leading /, which seems idiomatic
       // I allow the "english.wordlist" string because it's statically safe
-      val resource = Source.fromURL(getClass.getResource("/english.wordlist"))
-      val words    = resource.getLines().filterNot(_.isEmpty).toSeq
+      val resource = Source.fromURL(getClass.getResource("/english.wordlist")) // TODO load this using an effect
+      val words    = resource.getLines().filterNot(_.isEmpty).toList
       resource.close()
       SortedSet(words: _*)
     }
