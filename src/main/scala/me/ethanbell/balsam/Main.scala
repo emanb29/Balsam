@@ -13,13 +13,15 @@ object Main extends zio.App {
    * @param args the arguments with which the program was called
    * @return An exit code
    */
-  override def run(args: List[String]): ZIO[zio.ZEnv, Nothing, Int] =
+  override def run(args: List[String]): URIO[zio.ZEnv, Int] =
     runHandlingErrors(
       ZIO
         .fromTry(Try {
           BitChunk.fromHexString(args.head)
         })
-        .flatMap(Mnemonic.phraseFromBitChunk(_))
+        .flatMap(Entropy.fromBitChunk)
+        .map(Mnemonic.fromEntropy(_))
+        .flatMap(_.phrase())
         .flatMap(putStrLn)
     )
 
