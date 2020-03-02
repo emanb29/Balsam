@@ -8,7 +8,7 @@ ThisBuild / name := "Balsam"
 val catsV       = "2.1.0"
 val mouseV      = "0.24"
 val zioV        = "1.0.0-RC17"
-val bitchunkV   = "3.0.0-SNAPSHOT"
+val bitchunkV   = "4.0.0-SNAPSHOT"
 val scalaTestV  = "3.1.1"
 val scalaCheckV = "1.14.1"
 
