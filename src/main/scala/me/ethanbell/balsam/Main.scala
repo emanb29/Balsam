@@ -30,14 +30,18 @@ object Main extends zio.App {
           args(1).toInt
         })
         phrase: String <- phraseLen.foldM(_ => mnemonic.phrase(), mnemonic.phrase)
-        cards          <- Splittable(phrase.split(" ").toSeq).split23()
         _ <- putStrLn(
-          s"Entropy $entropy generated phrase $phrase which splits into the following cards:"
+          s"""$entropy generated phrase "$phrase""""
         )
-        cardPrints = for {
-          card      <- cards
-          printable <- card.map(_.getOrElse("XXXXXX"))
-        } yield printable.mkString(" ")
+        _          <- putStrLn(s""""$phrase" splits into the following 2-3 share cards:""")
+        cardShares <- Splittable(phrase.split(" ").toSeq).split23()
+        cardPrints <- ZIO.foreach(cardShares) { share =>
+          ZIO
+            .foreach(share) { wordOpt =>
+              ZIO.fromOption(wordOpt).catchAll(_ => ZIO("XXXXX"))
+            }
+            .map(_.mkString(" "))
+        }
         _ <- putStrLn(cardPrints.mkString("\n"))
       } yield ()
     }

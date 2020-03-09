@@ -1,7 +1,6 @@
 package me.ethanbell.balsam
 
 import zio.IO
-import cats.implicits._
 
 object Splittable {
   type Share[A] = List[Option[A]]
@@ -32,9 +31,9 @@ case class Splittable[A](es: Seq[A]) {
     (ls zip rs).map {
       case (Some(shareFromLeft), None)  => Some(shareFromLeft)
       case (None, Some(shareFromRight)) => Some(shareFromRight)
-      case (None, None)                 => None
-      case (Some(_), Some(_)) =>
-        throw new RuntimeException("Attempted to merge non-disjoint shares") // TODO lift into pure IO?
+      case (l, r) if l == r             => l
+      case (Some(shareFromLeft), Some(shareFromRight)) if shareFromLeft != shareFromRight =>
+        throw new RuntimeException("Attempted to merge conflicting shares") // TODO lift into pure IO?
     }
   }
 
@@ -58,13 +57,14 @@ case class Splittable[A](es: Seq[A]) {
       )
     else
       IO.succeed {
-        es.zip((0 until es.length).map(_ % count)) // label each element with the modulo group it should go in
+        es.zip(es.indices.map(_ % count)) // label each element with the modulo group it should go in
           .map { // assemble a list of n-vectors of the form (None, ... Some, ... None) where Some is at the index of the modulo group
             case (elem, idx) =>
               Vector.fill(count)(None).updated(idx, Some(elem))
           }
           .toList
-          .sequence // "unzip" the n-vectors into n lists
+          .transpose
+          .toVector // "unzip" the m n-vectors into n m-lists
       }
   def split23(): IO[IllegalArgumentException, Vector[Share[A]]] = mutuallyExclusiveShares(3).map {
     shares =>
