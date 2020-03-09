@@ -1,7 +1,6 @@
 package me.ethanbell.balsam
 
-import zio.{IO, ZIO}
-import cats._
+import zio.IO
 import cats.implicits._
 
 object Splittable {

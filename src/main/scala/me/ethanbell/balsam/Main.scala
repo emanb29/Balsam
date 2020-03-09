@@ -14,9 +14,13 @@ object Main extends zio.App {
    * @return An exit code
    */
   override def run(args: List[String]): URIO[zio.ZEnv, Int] =
-    runHandlingErrors {
-      val phraseIO = for {
-        hexStr <- ZIO.fromOption[String](args.headOption)
+    runHandlingErrors[zio.ZEnv, Any] {
+      for {
+        hexStr <- IO
+          .fromOption(args.headOption)
+          .mapError(
+            _ -> new IllegalArgumentException("Please pass a hex string in the first argument")
+          )
         bitchunk <- ZIO.fromTry(Try {
           BitChunk.fromHexString(hexStr)
         })
@@ -25,9 +29,17 @@ object Main extends zio.App {
         phraseLen = ZIO.fromTry(Try {
           args(1).toInt
         })
-        phrase <- phraseLen.foldM(_ => mnemonic.phrase(), mnemonic.phrase)
-      } yield phrase
-      phraseIO.flatMap(putStrLn)
+        phrase: String <- phraseLen.foldM(_ => mnemonic.phrase(), mnemonic.phrase)
+        cards          <- Splittable(phrase.split(" ").toSeq).split23()
+        _ <- putStrLn(
+          s"Entropy $entropy generated phrase $phrase which splits into the following cards:"
+        )
+        cardPrints = for {
+          card      <- cards
+          printable <- card.map(_.getOrElse("XXXXXX"))
+        } yield printable.mkString(" ")
+        _ <- putStrLn(cardPrints.mkString("\n"))
+      } yield ()
     }
 
   def runHandlingErrors[R, E](program: ZIO[R, E, Unit]): URIO[Console with R, Int] =
