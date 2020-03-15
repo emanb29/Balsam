@@ -4,6 +4,36 @@ import zio.IO
 
 object Splittable {
   type Share[A] = List[Option[A]]
+
+  /**
+   * Given some lists of shares, merge them down to a single share containing all their values
+   * @example mergeShares({[Some(3), None, None],[None, Some(5), None]}) == [Some(3), Some(5), None]
+   * @param shares the shares to merge
+   * @return the merged shares
+   */
+  def mergeShares[A](shares: Seq[Share[A]]): IO[IllegalArgumentException, Share[A]] =
+    shares
+      .foldLeft[IO[IllegalArgumentException, Share[A]]] { // If shares is empty, fail, else seed the fold with the leftmost value (the head)
+        shares match {
+          case Seq() => IO.fail(new IllegalArgumentException("Attempted to merge no shares"))
+          case elems @ (head +: _) if elems.exists(_.length != head.length) =>
+            IO.fail(new IllegalArgumentException("Attempted to merge shares of different lengths"))
+          case (head +: _) => IO.succeed(List.fill(head.length)(None))
+        }
+      } { (acc, rightShare: Share[A]) =>
+        acc.flatMap { (leftShare: Share[A]) =>
+          val zippedIO: List[IO[IllegalArgumentException, Option[A]]] =
+            (leftShare zip rightShare).map {
+              case (Some(shareFromLeft), None)  => IO.succeed(Some(shareFromLeft))
+              case (None, Some(shareFromRight)) => IO.succeed(Some(shareFromRight))
+              case (l, r) if l == r             => IO.succeed(l)
+              case (Some(shareFromLeft), Some(shareFromRight)) if shareFromLeft != shareFromRight =>
+                IO.fail(new IllegalArgumentException("Attempted to merge conflicting shares"))
+            }
+          IO.collectAll(zippedIO)
+        }
+      }
+
 }
 
 /**
@@ -19,23 +49,6 @@ object Splittable {
  */
 case class Splittable[A](es: Seq[A]) {
   import Splittable.Share
-
-  /**
-   * Given some lists of shares, merge them down to a single share containing all their values
-   * @note impure, therefore private -- will fail when shares is empty or shares are not the same length, and will be incorrect when shares are not disjoint
-   * @example mergeShares({[Some(3), None, None],[None, Some(5), None]}) == [Some(3), Some(5), None]
-   * @param shares the shares to merge
-   * @return the merged shares
-   */
-  private def mergeShares(shares: Seq[Share[A]]): Share[A] = shares.reduce { (ls, rs) =>
-    (ls zip rs).map {
-      case (Some(shareFromLeft), None)  => Some(shareFromLeft)
-      case (None, Some(shareFromRight)) => Some(shareFromRight)
-      case (l, r) if l == r             => l
-      case (Some(shareFromLeft), Some(shareFromRight)) if shareFromLeft != shareFromRight =>
-        throw new RuntimeException("Attempted to merge conflicting shares") // TODO lift into pure IO?
-    }
-  }
 
   /**
    * Split a Seq of elements into [[count]] mutually-exclusive shares
@@ -66,14 +79,21 @@ case class Splittable[A](es: Seq[A]) {
           .transpose
           .toVector // "unzip" the m n-vectors into n m-lists
       }
-  def split23(): IO[IllegalArgumentException, Vector[Share[A]]] = mutuallyExclusiveShares(3).map {
-    shares =>
-      for {
-        notPrivyToWhich <- shares.indices.toVector
+
+  /**
+   * Split a Seq of elements in a 2-3 secret-sharing scheme (not information-secure)
+   * @return
+   */
+  def split23(): IO[IllegalArgumentException, Vector[Share[A]]] =
+    mutuallyExclusiveShares(3).flatMap { shares =>
+      val mergedShares = for {
+        notPrivyToWhich <- shares.indices
         before = shares.take(notPrivyToWhich)
         after  = shares.drop(notPrivyToWhich + 1)
-      } yield mergeShares(before ++ after)
-  }
+      } yield Splittable.mergeShares(before ++ after)
+      IO.collectAll(mergedShares).map(_.toVector)
+    }
+
 //  TODO this is nontrivial while retaining readability of split shares (without re-encoding as a seemingly unrelated string)
 //  def thresholdedSplit(
 //    threshold: Int,
