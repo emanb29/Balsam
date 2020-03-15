@@ -6,7 +6,7 @@ import scala.collection.immutable.SortedSet
 import scala.io.Source
 
 /**
- *
+ * A list of precisely 2048 words, standardized by the BIP39 spec
  */
 trait WordList extends Iterable[String] {
 

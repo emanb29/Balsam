@@ -46,6 +46,9 @@ object Main extends zio.App {
       } yield ()
     }
 
+  /**
+   * Run a ZIO program, logging any errors, throwable or otherwise, and returning an appropriate exit status
+   */
   def runHandlingErrors[R, E](program: ZIO[R, E, Unit]): URIO[Console with R, Int] =
     program
       .mapError {

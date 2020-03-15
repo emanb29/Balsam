@@ -10,6 +10,12 @@ object Mnemonic {
     wordList: WordList = WordList.English
   ): Mnemonic = Mnemonic(entropy, wordList)
 }
+
+/**
+ * A mnemonic phrase representing an entropy
+ * @param entropy a BIP39 entropy
+ * @param wordList
+ */
 case class Mnemonic(entropy: Entropy, wordList: WordList = WordList.English) {
   def phrase(): IO[IndexOutOfBoundsException, String] =
     IO.foreach(entropy.wordIndices)(wordList.apply).map(_.mkString(" "))
